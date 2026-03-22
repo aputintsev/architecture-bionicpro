@@ -12,6 +12,7 @@ BionicPRO ETL DAG
 """
 
 from airflow import DAG
+from airflow.models import Variable
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
 from collections import Counter
@@ -61,6 +62,10 @@ MOVEMENT_TYPES = ['grip', 'open', 'pinch']
 # ──────────────────────────────────────────────────────────────
 
 def generate_telemetry(**context):
+    if Variable.get("enable_telemetry_generation", default_var="false").lower() != "true":
+        print("Генерация телеметрии отключена (Airflow Variable: enable_telemetry_generation=false)")
+        return
+
     interval_start = context['data_interval_start']
     interval_end = context['data_interval_end']
 
@@ -251,4 +256,4 @@ with DAG(
         python_callable=build_mart,
     )
 
-    task_create_mart >> task_generate_telemetry >> task_build_mart
+    task_create_mart >> [task_generate_telemetry, task_build_mart]

@@ -177,8 +177,6 @@ services:
       POSTGRES_USER: airflow
       POSTGRES_PASSWORD: airflow
       POSTGRES_DB: airflow
-    volumes:
-      - ./airflow/dags/sql/init-db.sql:/docker-entrypoint-initdb.d/db.sql
     logging:
       options:
         max-size: 10m
@@ -233,7 +231,7 @@ services:
     healthcheck:
       test:
         - CMD-SHELL
-        - airflow jobs check --job-type TriggererJob --hostname "${HOSTNAME}"
+        - airflow jobs check --job-type TriggererJob --hostname "$$HOSTNAME"
       interval: 30s
       timeout: 10s
       retries: 5
