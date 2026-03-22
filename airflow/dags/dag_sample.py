@@ -58,7 +58,39 @@ MOVEMENT_TYPES = ['grip', 'open', 'pinch']
 
 
 # ──────────────────────────────────────────────────────────────
-# Шаг 1. Генерация телеметрии в PostgreSQL (имитация потока)
+# Шаг 1. Создание витрины в ClickHouse
+# ──────────────────────────────────────────────────────────────
+
+def create_mart_table():
+    client = clickhouse_connect.get_client(host=CLICKHOUSE_HOST, port=CLICKHOUSE_PORT)
+
+    # Витрина: агрегированные данные по клиентам для сервиса отчётов.
+    # ORDER BY (customer_id, prosthetic_id, report_date) обеспечивает
+    # быстрый доступ к данным конкретного пользователя.
+    client.command("""
+        CREATE TABLE IF NOT EXISTS customer_report_mart (
+            customer_id          UInt64,
+            prosthetic_id        String,
+            report_date          Date,
+            customer_name        String,
+            customer_email       String,
+            total_events         UInt64,
+            avg_response_time_ms Float32,
+            min_response_time_ms UInt32,
+            max_response_time_ms UInt32,
+            avg_battery_level    Float32,
+            avg_signal_quality   Float32,
+            anomaly_count        UInt64,
+            most_common_movement String
+        ) ENGINE = ReplacingMergeTree()
+        ORDER BY (customer_id, prosthetic_id, report_date)
+    """)
+
+
+# ──────────────────────────────────────────────────────────────
+# Шаг 2 (опционально). Генерация телеметрии в PostgreSQL
+#   Имитация IoT-потока для разработки и тестирования.
+#   Управляется через Airflow Variable: enable_telemetry_generation
 # ──────────────────────────────────────────────────────────────
 
 def generate_telemetry(**context):
@@ -112,36 +144,6 @@ def generate_telemetry(**context):
             """, rows)
         conn.commit()
     print(f'Сгенерировано 10 новых событий телеметрии, event_id: {max_id + 1}–{max_id + 10}')
-
-
-# ──────────────────────────────────────────────────────────────
-# Шаг 2. Создание витрины в ClickHouse
-# ──────────────────────────────────────────────────────────────
-
-def create_mart_table():
-    client = clickhouse_connect.get_client(host=CLICKHOUSE_HOST, port=CLICKHOUSE_PORT)
-
-    # Витрина: агрегированные данные по клиентам для сервиса отчётов.
-    # ORDER BY (customer_id, prosthetic_id, report_date) обеспечивает
-    # быстрый доступ к данным конкретного пользователя.
-    client.command("""
-        CREATE TABLE IF NOT EXISTS customer_report_mart (
-            customer_id          UInt64,
-            prosthetic_id        String,
-            report_date          Date,
-            customer_name        String,
-            customer_email       String,
-            total_events         UInt64,
-            avg_response_time_ms Float32,
-            min_response_time_ms UInt32,
-            max_response_time_ms UInt32,
-            avg_battery_level    Float32,
-            avg_signal_quality   Float32,
-            anomaly_count        UInt64,
-            most_common_movement String
-        ) ENGINE = ReplacingMergeTree()
-        ORDER BY (customer_id, prosthetic_id, report_date)
-    """)
 
 
 # ──────────────────────────────────────────────────────────────
