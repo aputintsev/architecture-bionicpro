@@ -78,6 +78,36 @@ services:
     networks:
       - app_network
 
+  reports:
+    build:
+      context: ./reports
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      AUTH_SERVICE_URL: http://auth:8001
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_PORT: "8123"
+    depends_on:
+      - auth
+      - clickhouse
+    networks:
+      - app_network
+
+  auth:
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_REALM: reports-realm
+    depends_on:
+      - keycloak
+    networks:
+      - app_network
+
   # --- CRM PostgreSQL ---
   crm-postgres:
     image: postgres:16.0
