@@ -51,8 +51,6 @@ CUSTOMERS = [
     (648821,  'PROS-001'),
     (6488214, 'PROS-002'),
     (6488211, 'PROS-003'),
-    (6488219, 'PROS-004'),
-    (648801,  'PROS-005'),
 ]
 MOVEMENT_TYPES = ['grip', 'open', 'pinch']
 
@@ -94,7 +92,7 @@ def create_mart_table():
 # ──────────────────────────────────────────────────────────────
 
 def generate_telemetry(**context):
-    if Variable.get("enable_telemetry_generation", default_var="false").lower() != "true":
+    if Variable.get("enable_telemetry_generation", default_var="true").lower() != "true":
         print("Генерация телеметрии отключена (Airflow Variable: enable_telemetry_generation=false)")
         return
 
@@ -141,6 +139,7 @@ def generate_telemetry(**context):
                     (event_id, prosthetic_id, customer_id, event_timestamp,
                      response_time_ms, battery_level, signal_quality, movement_type, is_anomaly)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (event_id) DO NOTHING
             """, rows)
         conn.commit()
     print(f'Сгенерировано 10 новых событий телеметрии, event_id: {max_id + 1}–{max_id + 10}')
@@ -258,4 +257,4 @@ with DAG(
         python_callable=build_mart,
     )
 
-    task_create_mart >> [task_generate_telemetry, task_build_mart]
+    task_create_mart >> task_generate_telemetry >> task_build_mart

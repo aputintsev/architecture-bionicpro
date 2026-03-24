@@ -8,8 +8,6 @@ CREATE TABLE customers (
 );
 
 INSERT INTO customers VALUES
-    (648821,  'Иван Петров',     'prothetic1@example.com', 'PROS-001', '2024-01-15', 85000.00),
-    (6488214, 'Мария Сидорова',  'prothetic2@example.com', 'PROS-002', '2024-02-20', 92000.00),
-    (6488211, 'Алексей Козлов',  'prothetic3@example.com', 'PROS-003', '2024-03-10', 78000.00),
-    (6488219, 'Елена Новикова',  'e.novikova@mail.ru',     'PROS-004', '2024-04-05', 105000.00),
-    (648801,  'Дмитрий Волков',  'd.volkov@mail.ru',       'PROS-005', '2024-05-18', 67000.00);
+    (648821,  'Prothetic One',   'prothetic1@example.com', 'PROS-001', '2024-01-15', 85000.00),
+    (6488214, 'Prothetic Two',   'prothetic2@example.com', 'PROS-002', '2024-02-20', 92000.00),
+    (6488211, 'Prothetic Three', 'prothetic3@example.com', 'PROS-003', '2024-03-10', 78000.00);

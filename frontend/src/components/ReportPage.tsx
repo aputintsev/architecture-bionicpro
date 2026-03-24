@@ -6,6 +6,7 @@ interface ReportRow {
   prosthetic_id: string;
   report_date: string;
   customer_name: string;
+  customer_email: string;
   total_events: number;
   avg_response_time_ms: number;
   min_response_time_ms: number;
@@ -85,7 +86,7 @@ const ReportPage: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-      <div className="w-full max-w-4xl p-8 bg-white rounded-lg shadow-md">
+      <div className="w-full max-w-7xl p-8 bg-white rounded-lg shadow-md">
         <h1 className="text-2xl font-bold mb-2">Usage Reports</h1>
         <p className="text-gray-500 mb-6">Logged in as: {keycloak.tokenParsed?.preferred_username}</p>
 
@@ -121,9 +122,14 @@ const ReportPage: React.FC = () => {
                     <thead className="bg-gray-50">
                       <tr>
                         <th className="border border-gray-200 px-3 py-2 text-left">Date</th>
+                        <th className="border border-gray-200 px-3 py-2 text-right">Customer ID</th>
+                        <th className="border border-gray-200 px-3 py-2 text-left">Name</th>
+                        <th className="border border-gray-200 px-3 py-2 text-left">Email</th>
                         <th className="border border-gray-200 px-3 py-2 text-left">Prosthetic</th>
                         <th className="border border-gray-200 px-3 py-2 text-right">Events</th>
                         <th className="border border-gray-200 px-3 py-2 text-right">Avg Response (ms)</th>
+                        <th className="border border-gray-200 px-3 py-2 text-right">Min Response (ms)</th>
+                        <th className="border border-gray-200 px-3 py-2 text-right">Max Response (ms)</th>
                         <th className="border border-gray-200 px-3 py-2 text-right">Avg Battery %</th>
                         <th className="border border-gray-200 px-3 py-2 text-right">Avg Signal %</th>
                         <th className="border border-gray-200 px-3 py-2 text-right">Anomalies</th>
@@ -134,9 +140,14 @@ const ReportPage: React.FC = () => {
                       {report.rows.map((row, i) => (
                         <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                           <td className="border border-gray-200 px-3 py-2">{row.report_date}</td>
+                          <td className="border border-gray-200 px-3 py-2 text-right">{row.customer_id}</td>
+                          <td className="border border-gray-200 px-3 py-2">{row.customer_name}</td>
+                          <td className="border border-gray-200 px-3 py-2">{row.customer_email}</td>
                           <td className="border border-gray-200 px-3 py-2">{row.prosthetic_id}</td>
                           <td className="border border-gray-200 px-3 py-2 text-right">{row.total_events}</td>
                           <td className="border border-gray-200 px-3 py-2 text-right">{row.avg_response_time_ms.toFixed(1)}</td>
+                          <td className="border border-gray-200 px-3 py-2 text-right">{row.min_response_time_ms}</td>
+                          <td className="border border-gray-200 px-3 py-2 text-right">{row.max_response_time_ms}</td>
                           <td className="border border-gray-200 px-3 py-2 text-right">{row.avg_battery_level.toFixed(1)}</td>
                           <td className="border border-gray-200 px-3 py-2 text-right">{row.avg_signal_quality.toFixed(1)}</td>
                           <td className={`border border-gray-200 px-3 py-2 text-right ${row.anomaly_count > 0 ? 'text-red-600 font-semibold' : ''}`}>
